@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeAnthem: Stock Average Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; /* Adds spacing between the two boxes */
+        }
+
+        .box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-left: 4px solid #28a745;
+            border-radius: 5px;
+            display: none;
+            font-size: 18px;
+        }
+
+        .result-highlight {
+            color: green;
+            font-weight: bold;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eaf9ea;
+            border-left: 4px solid #28a745;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .result-container div {
+            margin-bottom: 5px;
+        }
+
+        button {
+            width: 48%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .clear-button {
+            background-color: #dc3545;
+        }
+
+        .clear-button:hover {
+            background-color: #c82333;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>TradeAnthem: Stock Average Calculator</h1>
+
+    <div class="container">
+        <div class="box">
+            <h3>First Purchase</h3>
+            <div class="input-group">
+                <label for="initialQuantity">Units</label>
+                <input type="number" id="initialQuantity" placeholder="Enter the number of units" required>
+            </div>
+            <div class="input-group">
+                <label for="initialPrice">Price per share</label>
+                <input type="number" id="initialPrice" placeholder="Enter the price per share" required>
+            </div>
+            <div id="firstPurchaseInvested" class="result-section">
+                The amount invested in the 1st purchase: <span id="firstAmount" class="result-highlight"></span>
+            </div>
+        </div>
+
+        <div class="box">
+            <h3>Second Purchase</h3>
+            <div class="input-group">
+                <label for="newQuantity">Units</label>
+                <input type="number" id="newQuantity" placeholder="Enter the number of units" required>
+            </div>
+            <div class="input-group">
+                <label for="newPrice">Price per share</label>
+                <input type="number" id="newPrice" placeholder="Enter the price per share" required>
+            </div>
+            <div id="secondPurchaseInvested" class="result-section">
+                The amount invested in the 2nd purchase: <span id="secondAmount" class="result-highlight"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button onclick="calculateAverage()">Calculate Average</button>
+        <button class="clear-button" onclick="clearFields()">Clear Fields</button>
+    </div>
+
+    <div id="result" class="result-container" style="display: none;">
+        <div>Total units: <span id="totalUnits" class="result-highlight"></span></div>
+        <div>Average Price: <span id="averagePrice" class="result-highlight"></span></div>
+        <div>Total Amount: <span id="totalAmount" class="result-highlight"></span></div>
+    </div>
+
+    <div id="error" class="error">Please enter valid numbers for all fields.</div>
+
+    <script>
+        function calculateAverage() {
+            const initialQuantity = parseFloat(document.getElementById('initialQuantity').value);
+            const initialPrice = parseFloat(document.getElementById('initialPrice').value);
+            const newQuantity = parseFloat(document.getElementById('newQuantity').value);
+            const newPrice = parseFloat(document.getElementById('newPrice').value);
+
+            const errorElement = document.getElementById('error');
+            const resultElement = document.getElementById('result');
+            const firstPurchaseInvested = document.getElementById('firstPurchaseInvested');
+            const secondPurchaseInvested = document.getElementById('secondPurchaseInvested');
+
+            // Input validation
+            if (isNaN(initialQuantity) || isNaN(initialPrice) || isNaN(newQuantity) || isNaN(newPrice) || initialQuantity <= 0 || newQuantity <= 0) {
+                errorElement.style.display = 'block';
+                resultElement.style.display = 'none';
+                firstPurchaseInvested.style.display = 'none';
+                secondPurchaseInvested.style.display = 'none';
+                return;
+            } else {
+                errorElement.style.display = 'none';
+            }
+
+            // Calculation logic
+            const totalQuantity = initialQuantity + newQuantity;
+            const totalInvestment = (initialQuantity * initialPrice) + (newQuantity * newPrice);
+            const averagePrice = totalInvestment / totalQuantity;
+            const firstAmount = initialQuantity * initialPrice;
+            const secondAmount = newQuantity * newPrice;
+
+            // Display the invested amounts
+            document.getElementById('firstAmount').innerText = `₹${firstAmount.toLocaleString()}`;
+            document.getElementById('secondAmount').innerText = `₹${secondAmount.toLocaleString()}`;
+            firstPurchaseInvested.style.display = 'block';
+            secondPurchaseInvested.style.display = 'block';
+
+            // Display the result
+            document.getElementById('totalUnits').innerText = totalQuantity;
+            document.getElementById('averagePrice').innerText = `₹${averagePrice.toFixed(2)}`;
+            document.getElementById('totalAmount').innerText = `₹${totalInvestment.toLocaleString()}`;
+            resultElement.style.display = 'block';
+        }
+
+        function clearFields() {
+            // Clear all input fields
+            document.getElementById('initialQuantity').value = '';
+            document.getElementById('initialPrice').value = '';
+            document.getElementById('newQuantity').value = '';
+            document.getElementById('newPrice').value = '';
+
+            // Hide result and error messages
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('firstPurchaseInvested').style.display = 'none';
+            document.getElementById('secondPurchaseInvested').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
